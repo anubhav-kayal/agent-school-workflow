@@ -14,3 +14,4 @@
 - chore(db): Alembic async env + initial migration (round-trip verified, alembic check clean). Next: Pydantic schemas.
 - feat(schemas): Pydantic v2 schemas (Indian mobile → E.164, paise, consent required, extra fields forbidden). Next: demo seed.
 - feat(seed): idempotent fake demo school (users, ad accounts, 11 KB facts incl. 1 unverified, 14 days of IST slots). Next: model integrity tests.
+- test(models): lead hard-delete cascade, slot delete protection, migration/model drift check on scratch DB. M1 complete. Next (after go-ahead): M2 leads + WhatsApp assistant.
