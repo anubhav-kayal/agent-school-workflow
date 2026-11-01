@@ -20,3 +20,9 @@ class UserRole(StrEnum):
 class Platform(StrEnum):
     META = "meta"
     GOOGLE = "google"
+
+
+class MetricLevel(StrEnum):
+    CAMPAIGN = "campaign"
+    AD_SET = "ad_set"  # Google: ad group
+    AD = "ad"
