@@ -45,3 +45,4 @@
 - feat(jobs): arq worker — first response, Meta lead intake (+first template in same job), inbound WhatsApp, reminders cron /15min; DRY_RUN → logging transport; no API key → polite fallback + escalation. Next: DPDP lead deletion.
 - feat(privacy): DPDP erase-lead admin action (CLI) — scrub PII + message text, opt out, free booked seat, keep anonymous funnel, audit log. Next: end-to-end integration test.
 - test(integration): lead → template (no LLM) → fees (KB) → slot button → counselor alert → 'Visited' tap → lead_event pending CAPI sync, all via real webhooks + worker jobs. Next: evals.
+- feat(evals): runner (real model, per-scenario rolled-back transaction, --tier, JSON results with pass rate + avg cost/conversation USD/INR) + deterministic scoring + 17 assistant scenarios (incl. the 15 required). Next: run evals (needs OPENAI_API_KEY).

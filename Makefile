@@ -22,7 +22,7 @@ test: install ## Run the test suite
 lint: install ## Ruff lint + format check + mypy
 	$(RUN) ruff check .
 	$(RUN) ruff format --check .
-	$(RUN) mypy app
+	$(RUN) mypy app evals
 
 fmt: ## Auto-format and fix lint
 	$(RUN) ruff format .
@@ -37,7 +37,7 @@ seed: ## Load fake demo data
 	else echo "seed arrives in M1"; fi
 
 evals: ## Run LLM evals (calls the real Claude API; never in CI)
-	@if [ -f evals/runner.py ]; then $(RUN) python -m evals.runner; \
+	@if [ -f evals/runner.py ]; then $(RUN) python -m evals.runner --tier $${TIER:-tier_fast}; \
 	else echo "evals arrive in M2"; fi
 
 run: ## Start the API with autoreload
