@@ -43,3 +43,4 @@
 - feat(webhooks): WhatsApp webhook (challenge, signature, statuses inline, messages queued as wa:<wamid>) + processing (counselor taps vs parents, unknown parent → whatsapp lead, conversation handler). Next: arq worker + reminders.
 - feat(reminders): day-before (18:00 IST) + morning-of (max(08:00, -2h)) templates, sent once, never to opted-out/deleted leads (tested). Next: arq worker.
 - feat(jobs): arq worker — first response, Meta lead intake (+first template in same job), inbound WhatsApp, reminders cron /15min; DRY_RUN → logging transport; no API key → polite fallback + escalation. Next: DPDP lead deletion.
+- feat(privacy): DPDP erase-lead admin action (CLI) — scrub PII + message text, opt out, free booked seat, keep anonymous funnel, audit log. Next: end-to-end integration test.
