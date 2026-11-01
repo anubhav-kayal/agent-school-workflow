@@ -21,3 +21,4 @@
 - feat(adapters): WhatsApp Cloud API transport (retry/backoff on 429/5xx, re-engagement error mapping), respx tests. Next: LLM provider (OpenAI).
 - feat(leads): idempotent lead intake (+conversation, created event) and first-response template with first_response_at, no LLM. Next: LLM provider interface.
 - feat(services): verified-only KB access + byte-stable prompt block; atomic visit booking with reschedule. Next: LLM provider.
+- feat(routing): deterministic inbound router (STOP en/hi/hinglish exact-match, opt-out/slot/counselor buttons) — skips LLM. Next: OpenAI tier proposal.
