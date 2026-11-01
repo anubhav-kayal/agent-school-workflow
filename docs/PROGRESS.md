@@ -24,3 +24,4 @@
 - feat(routing): deterministic inbound router (STOP en/hi/hinglish exact-match, opt-out/slot/counselor buttons) — skips LLM. Next: OpenAI tier proposal.
 - docs(plan): OpenAI tier → model proposal with prices (awaiting approval).
 - refactor(config): switch to OpenAI — LLM tiers (fast=gpt-6-luna, standard/strategy=gpt-6.1-sol), OpenAI pricing w/ long-context multipliers, OPENAI_API_KEY, store=false, DEMO_MODE; anthropic removed. Next: ARCHITECTURE OpenAI section.
+- docs(architecture): OpenAI Responses API choice, caching, batch fallback, parameter behaviour, data handling (with doc links).

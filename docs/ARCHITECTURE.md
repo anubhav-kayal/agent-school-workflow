@@ -9,9 +9,9 @@
                          Redis + arq workers (jobs, cron schedules, retries)
           ┌──────────────┬───────────────┬──────────────┬────────────────┐
           ▼              ▼               ▼              ▼                ▼
-   Assistant (Haiku)  Monitor        Optimizer      Creative/Reporter  Strategist
-   deterministic      rules in code  pre-gate in    (Sonnet, Batch)    (Opus, Batch)
-   router first       → Haiku triage code → Sonnet
+   Assistant (fast)   Monitor        Optimizer      Creative/Reporter  Strategist
+   deterministic      rules in code  pre-gate in    (standard, Batch)  (strategy, Batch)
+   router first       → fast triage  code → standard
           │              │               │              │                │
           └──────────────┴──────► proposed_actions ◄────┴────────────────┘
                                          │
@@ -25,9 +25,9 @@
 
 ## Layers
 
-- **adapters/** — one interface per external API (Meta Marketing, Meta leadgen, Meta CAPI, Google Ads, Google conversions, WhatsApp, Anthropic). Each has a fake in `adapters/fakes/`. Tests only ever use fakes or `respx`. API versions come from config.
+- **adapters/** — one interface per external API (Meta Marketing, Meta leadgen, Meta CAPI, Google Ads, Google conversions, WhatsApp, Email). Each has a fake in `adapters/fakes/`. Tests only ever use fakes or `respx`. API versions come from config.
 - **metrics/** — pure Python over DB rows: KPIs, anomaly rules, agent summaries. LLMs never compute numbers.
-- **agents/** — `base.py` wraps the Anthropic SDK: model/effort from config, prompt caching, tool loop with max iterations, token budget, retries, Pydantic validation, `agent_runs` logging with cost in USD and INR. Prompts are markdown files in `agents/prompts/`.
+- **agents/** — agents never import an SDK. `agents/llm/` holds a small `LLMProvider` interface and the `OpenAIProvider`. `base.py` runs the loop: tier/effort from config, prompt caching, tool loop with max iterations, token budget, retries, Pydantic validation, `agent_runs` logging with cost in USD and INR. Prompts are markdown files in `agents/prompts/`.
 - **guardrails/** — `rules.py` (pure functions, fully unit tested) and `executor.py` (the only code path that writes to ad platforms). Every proposal ends in an audit entry: applied, rejected, blocked (with rule) or dry_run.
 - **webhooks/** — signature checks, parsing, idempotent persistence, enqueue. No business logic or external calls inline.
 - **jobs/** — arq worker and cron schedules (Asia/Kolkata).
@@ -55,27 +55,60 @@
 | Hourly monitor, rule fired | Haiku writes severity + alert | Yes |
 | Optimizer, too little data / all in learning / summary unchanged | Pre-gate logs `no_action` | No |
 
-### 2. Prompt caching
-Request order: `tools` (fixed, sorted) → static system prompt → per-school verified KB block (explicit `cache_control` breakpoint) → conversation (automatic caching on the tail).
-- Byte-stable prefix: no timestamps or IDs before the breakpoint; KB serialised with `sort_keys=True` and ordered by `(topic, key)`.
-- KB block changes only when a verified fact is edited.
-- TTL: 5 minutes by default; 1 hour for low-traffic schools' assistant prefix (configurable).
-- `cache_read_tokens` and `cache_write_tokens` are logged per run; the cost page shows hit rate.
+### 2. Prompt caching (OpenAI)
+On GPT-5.6 and later models caching is **automatic**: no code change needed.
+Source: https://developers.openai.com/api/docs/guides/prompt-caching.md
+- Prompts of at least 1,024 tokens are eligible.
+- Cache reads are billed at 0.1x input (0.05x on gpt-6.1-sol and gpt-6.1-terra).
+- Cache writes are billed at 1.25x input (default 30-minute TTL) or 2.5x (12-hour TTL, `prompt_cache_options.ttl`).
+- An explicit mode (`prompt_cache_options.mode="explicit"` + breakpoints) exists. We start with automatic.
+- `prompt_cache_key` is set to `school:<id>:<agent>` for per-tenant accounting; routing doesn't need it on these models.
+- Above about 15 requests/min on one prefix, requests may land on machines without the cache. Not a concern at our volume.
+
+Layout either way: tools (fixed order) → static system prompt → school's verified KB (sorted JSON) → conversation. No timestamps or IDs before the conversation. `usage.input_tokens_details.cached_tokens` goes into `agent_runs.cache_read_tokens`.
 
 ### 3. Batch API (−50 %)
-Strategist, Reporter and Creative copy generation are single-shot and not latency sensitive, so they run through the Message Batches API and results are collected by a polling job. Assistant, Monitor and Optimizer stay synchronous.
+Source: https://developers.openai.com/api/docs/guides/batch.md
+- 50 % of Standard price. The completion window is fixed at 24 h. Input is JSONL with a `custom_id` per line, one model per file, and `/v1/responses` is supported.
+- Strategist, Reporter and weekly Creative generation use it.
+- The weekly report batch is submitted Sunday ~20:00 IST. If it isn't complete by Monday 08:30 IST, the job cancels it and regenerates through the normal API so delivery at 09:00 holds.
+- Urgent creative requests (Optimizer `request_creatives` with high urgency) use the normal API.
 
-### 4. Models and effort
-| Agent | Model (config) | Effort | Output |
+### 4. API, models and parameters
+- **API:** the **Responses API** via the official `openai` Python SDK (3.42).
+  - OpenAI recommends Responses for new projects (https://developers.openai.com/api/docs/guides/migrate-to-responses.md).
+  - GPT-6 models need it for tool calling (https://developers.openai.com/api/docs/guides/latest-model.md).
+- **Tools:**
+  - Function tools with `strict: true` and `additionalProperties: false`; optional fields are typed nullable.
+  - We resend the full input list (no server-side state) with `store=false`.
+  - Model output items, including reasoning items, are appended before our `function_call_output` items.
+  - Source: https://developers.openai.com/api/docs/guides/function-calling.md
+- **Structured outputs:** `responses.parse(text_format=PydanticModel)` (https://developers.openai.com/api/docs/guides/structured-outputs.md).
+
+| Tier | Model | Agents | Effort |
 |---|---|---|---|
-| Assistant | claude-haiku-5-5 | low | text + tools |
-| Monitor triage | claude-haiku-5-5 | low | structured output |
-| Optimizer | claude-sonnet-5-5 | medium | tools (`strict: true`, `tool_choice: auto`) |
-| Creative | claude-sonnet-5-5 | medium | structured output |
-| Reporter | claude-sonnet-5-5 | medium | structured output (markdown + numbers used) |
-| Strategist | claude-opus-5-5 | high | structured output |
+| tier_fast | gpt-6-luna | Assistant, Monitor triage | low |
+| tier_standard | gpt-6.1-sol | Optimizer, Creative, Reporter | medium |
+| tier_strategy | gpt-6.1-sol (Batch) | Strategist | high |
 
-Current Opus/Sonnet models reject forced `tool_choice` and sampling params, so JSON results use structured outputs and tool agents use `auto` with `strict` schemas.
+**Parameter behaviour** (https://developers.openai.com/api/docs/guides/latest-model.md, https://developers.openai.com/api/docs/guides/reasoning.md):
+- `temperature`, `top_p` and `top_logprobs` are rejected unless `reasoning.effort` is `none`. Only Luna and Terra accept `none`. We never send sampling parameters.
+- Effort levels:
+  - Sol: `low` … `max`. It has no `none`, and `minimal` maps to `low`.
+  - Luna and Terra: also accept `none`.
+  - Default is `medium`, so we always set it.
+- `max_output_tokens` includes reasoning tokens. Running out returns `status="incomplete"`, which `base.py` treats as an error and retries once with more room.
+
+### Data handling (OpenAI API)
+Source: https://developers.openai.com/api/docs/guides/your-data.md (read 2026-11-01)
+- API inputs and outputs are **not used for training** unless the organisation opts in.
+- Abuse-monitoring logs are kept up to **30 days**.
+- Zero Data Retention or Modified Abuse Monitoring requires OpenAI approval.
+- Responses are stored by default. We send **`store=false`** on every call, so OpenAI does not keep application state.
+- **India:** the `in` region offers data storage at rest only. **Inference runs outside India** (regional processing exists only for the US, EU and UAE).
+  - Parents' messages are therefore processed abroad. This is a DPDP consideration for the school's privacy notice and consent text.
+  - We send the minimum needed: first name, grade and message text. Never the phone number.
+  - Applying for ZDR is an open item.
 
 ### 5. Budgets
 - Per run: max tool iterations, max output tokens, token budget.
