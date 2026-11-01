@@ -9,3 +9,4 @@
 - fix(dev): compose on host ports 5433/6380 to avoid clashing with a native Postgres. Next: M1 models.
 - feat(models): base + naming convention, schools, guardrail_configs, users, ad_accounts; DB test fixtures. Next: ads mirror + metrics tables.
 - feat(models): campaigns/ad_sets/ads mirrors, metrics_hourly + metrics_daily with upsert keys. Next: leads, events, conversations, visit slots.
+- feat(models): leads (consent, opt-out, deletion, attribution), lead_events (idempotency key), conversations, messages, visit_slots, visit_bookings. Next: KB, creatives, agent runs, proposals, audit, reports.
