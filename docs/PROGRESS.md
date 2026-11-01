@@ -6,3 +6,4 @@
 - feat(app): FastAPI factory, /health + /health/ready, async engine/session. Next: docker-compose + Makefile.
 - chore: docker-compose (postgres 16, redis 7, test DB) + Makefile. Next: CI workflow.
 - ci: GitHub Actions lint + test with Postgres/Redis services. M0 complete. Next: M1 models.
+- fix(dev): compose on host ports 5433/6380 to avoid clashing with a native Postgres. Next: M1 models.

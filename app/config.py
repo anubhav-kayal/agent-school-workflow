@@ -88,9 +88,9 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     timezone: str = "Asia/Kolkata"
     database_url: str = (
-        "postgresql+asyncpg://admissionpilot:admissionpilot@localhost:5432/admissionpilot"
+        "postgresql+asyncpg://admissionpilot:admissionpilot@localhost:5433/admissionpilot"
     )
-    redis_url: str = "redis://localhost:6379/0"
+    redis_url: str = "redis://localhost:6380/0"
     session_secret: SecretStr = SecretStr("change-me-local-only")
 
     # --- safety (never relax defaults without explicit approval) ---
