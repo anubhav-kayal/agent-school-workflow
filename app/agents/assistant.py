@@ -17,6 +17,7 @@ from app.agents.language import detect_language
 from app.agents.llm import LLMError, LLMProvider, LLMRequest, Usage
 from app.agents.llm.types import Item
 from app.config import AgentName, Settings
+from app.formatting import to_ist
 from app.models import Conversation, Lead, Message, School
 from app.models.enums import Direction
 from app.services import kb
@@ -38,6 +39,12 @@ class AssistantReply:
     state: TurnState = field(default_factory=TurnState)
     agent_run_id: int | None = None
     usage: Usage = field(default_factory=Usage)
+
+
+def today_line(now: datetime) -> str:
+    """Volatile per-turn context (after the cached prefix) so relative days can be resolved."""
+    local = to_ist(now)
+    return f"TODAY: {local:%A} {local:%Y-%m-%d} (IST)"
 
 
 async def school_context(db: AsyncSession, school: School) -> str:
@@ -86,7 +93,7 @@ async def run_assistant(
     items = [
         provider.context_item(await school_context(db, school)),
         *await history_items(db, provider, conv),
-        provider.context_item(f"LANGUAGE_HINT: {language}"),
+        provider.context_item(f"{today_line(now)}\nLANGUAGE_HINT: {language}"),
     ]
     request = LLMRequest(
         model=settings.model_for(AgentName.ASSISTANT),

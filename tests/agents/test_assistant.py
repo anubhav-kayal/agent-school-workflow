@@ -52,7 +52,9 @@ async def test_unverified_fact_triggers_escalation_not_answer(db: AsyncSession) 
     first: LLMRequest = provider.requests[0]
     context = first.items[0]["content"]
     assert "fees.class_1" in context and "98%" not in context  # unverified never sent
-    assert first.items[-1]["content"] == "LANGUAGE_HINT: en"
+    assert first.items[-1]["content"] == "TODAY: Monday 2026-11-02 (IST)\nLANGUAGE_HINT: en"
+    # the date must stay out of the cached prefix (prompt + school KB)
+    assert "2026-11-02" not in first.instructions and "2026-11-02" not in context
     assert "store" not in first.__dict__  # provider decides; agents never see SDK options
 
 

@@ -19,6 +19,7 @@ class Transcript:
     escalated: bool = False
     booked: bool = False
     buttons_offered: int = 0
+    slot_labels: list[str] = field(default_factory=list)
     cost_usd: float = 0.0
     cost_inr: float = 0.0
     llm_calls: int = 0
@@ -63,6 +64,10 @@ def score(expect: dict[str, Any], t: Transcript) -> list[Check]:
         checks.append(Check(f"route {expect['route']}", expect["route"] in t.routes, str(t.routes)))
     if "no_reply" in expect:
         checks.append(Check("sends nothing", (not t.replies) == expect["no_reply"], str(t.replies)))
+    if "slot_labels_contain" in expect:
+        want = str(expect["slot_labels_contain"])
+        ok = bool(t.slot_labels) and all(want in label for label in t.slot_labels)
+        checks.append(Check(f"every offered slot is {want!r}", ok, str(t.slot_labels)))
     if "booked" in expect:
         checks.append(Check("visit booked", t.booked == expect["booked"], ""))
     if "slot_buttons" in expect:

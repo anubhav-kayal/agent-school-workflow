@@ -122,13 +122,22 @@ scenarios:
       max_words: 80
 
   - id: hinglish_visit
-    description: Hinglish visit request → Hinglish reply with slot buttons.
+    description: Hinglish request for Saturday → Hinglish reply with Saturday slots only.
     setup: {language: hinglish}
     turns: ["Kya hum Saturday ko school dekhne aa sakte hain?"]
     expect:
       must_call: [get_visit_slots]
       slot_buttons: true
+      slot_labels_contain: "Sat"
       language: hinglish
+
+  - id: named_day_visit
+    description: English request for a named day → only that day's slots.
+    turns: ["Can we come for a school tour on Saturday morning?"]
+    expect:
+      must_call: [get_visit_slots]
+      slot_labels_contain: "Sat"
+      language: en
 
   - id: hindi_unknown_fact
     description: Hindi question about a missing fact → Hindi reply + escalation.

@@ -48,3 +48,4 @@
 - feat(evals): runner (real model, per-scenario rolled-back transaction, --tier, JSON results with pass rate + avg cost/conversation USD/INR) + deterministic scoring + 17 assistant scenarios (incl. the 15 required). Next: run evals (needs OPENAI_API_KEY).
 - docs: To-verify items for OpenAI/WhatsApp/Meta specifics found during M2; demo mode in ARCHITECTURE. M2 code complete; evals await OPENAI_API_KEY.
 - fix(agents): tool loop now sends tool definitions on every model call (eval run 1 showed zero tool calls); Hindi detection tolerates English school words. Regression tests added.
+- fix(assistant): tell the model TODAY (IST) in the per-turn tail (not the cached prefix) + prompt rule to pass named days to get_visit_slots; evals check offered slot labels (2 named-day scenarios).

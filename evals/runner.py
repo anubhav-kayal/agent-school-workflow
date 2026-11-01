@@ -101,6 +101,7 @@ async def run_scenario(db: AsyncSession, deps: Deps, scenario: dict[str, Any]) -
             buttons = payload.get("interactive", {}).get("action", {}).get("buttons", [])
             last_buttons = [b["reply"]["id"] for b in buttons] or last_buttons
             t.buttons_offered += len(buttons)
+            t.slot_labels += [b["reply"]["title"] for b in buttons]
     runs = (await db.scalars(select(AgentRun).where(AgentRun.id > first_run_id))).all()
     t.tools = [tool for r in runs for tool in r.output.get("tools", [])]
     t.cost_usd = sum(float(r.cost_usd) for r in runs)
