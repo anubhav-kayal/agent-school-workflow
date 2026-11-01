@@ -45,7 +45,9 @@ _HINGLISH_MARKERS = {
 def detect_language(text: str) -> str:
     deva = len(_DEVANAGARI.findall(text))
     latin = len(_LATIN.findall(text))
-    if deva and deva >= latin:
+    # Hindi replies often keep English school words ("fees", "admission"); a third of the
+    # letters in Devanagari is already a Hindi message.
+    if deva and deva >= 0.3 * (deva + latin):
         return "hi"
     words = set(re.findall(r"[a-z]+", text.lower()))
     if words & _HINGLISH_MARKERS:

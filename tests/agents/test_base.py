@@ -29,6 +29,8 @@ async def test_loop_runs_tool_then_answers() -> None:
     second_input = provider.requests[1].items
     assert second_input[-1]["type"] == "function_call_output"
     assert "fees.class_1" in second_input[-1]["output"]
+    # Regression: the model must be told which tools exist on every call.
+    assert all([t.name for t in r.tools] == ["get_school_facts"] for r in provider.requests)
 
 
 async def test_terminal_tool_ends_turn() -> None:
