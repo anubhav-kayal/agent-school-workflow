@@ -22,55 +22,64 @@ class AgentName(StrEnum):
     STRATEGIST = "strategist"
 
 
+class LlmTier(StrEnum):
+    STRATEGY = "tier_strategy"
+    STANDARD = "tier_standard"
+    FAST = "tier_fast"
+
+
 class ModelPrice(BaseModel):
-    """USD per million tokens."""
+    """USD per million tokens (OpenAI Standard tier)."""
 
     input: float
+    cached_input: float
+    cache_write: float  # default 30-minute cache TTL
     output: float
-    cache_read: float
-    cache_write_5m: float
-    cache_write_1h: float
+    long_context_threshold: int = 272_000  # input tokens; above it the whole request costs more
+    long_context_input_multiplier: float = 2.0
+    long_context_output_multiplier: float = 1.5
 
 
 class AgentModelConfig(BaseModel):
-    model: str
-    effort: str = "medium"
-    max_output_tokens: int = 4096
+    tier: LlmTier
+    reasoning_effort: str = "low"  # none | low | medium | high | max (model-dependent)
+    max_output_tokens: int = 4096  # includes reasoning tokens
     max_tool_iterations: int = 6
     token_budget: int = 60_000  # total input+output tokens allowed per run
     use_batch: bool = False
 
 
-# TO VERIFY: list prices (USD / MTok) — confirm against anthropic.com/pricing before go-live.
+# Approved 2026-11-01 (docs/PLAN.md). Model IDs live only here.
+DEFAULT_TIERS: dict[LlmTier, str] = {
+    LlmTier.STRATEGY: "gpt-6.1-sol",
+    LlmTier.STANDARD: "gpt-6.1-sol",
+    LlmTier.FAST: "gpt-6-luna",
+}
+
+# Source: https://developers.openai.com/api/docs/pricing (read 2026-11-01).
 DEFAULT_PRICING: dict[str, ModelPrice] = {
-    "claude-opus-5-5": ModelPrice(
-        input=4.00, output=20.00, cache_read=0.20, cache_write_5m=5.00, cache_write_1h=8.00
-    ),
-    "claude-sonnet-5-5": ModelPrice(
-        input=2.00, output=10.00, cache_read=0.20, cache_write_5m=2.50, cache_write_1h=4.00
-    ),
-    "claude-haiku-5-5": ModelPrice(
-        input=0.10, output=0.50, cache_read=0.01, cache_write_5m=0.125, cache_write_1h=0.20
-    ),
+    "gpt-6.1-sol": ModelPrice(input=2.00, cached_input=0.10, cache_write=2.50, output=10.00),
+    "gpt-6.1-terra": ModelPrice(input=1.00, cached_input=0.05, cache_write=1.25, output=5.00),
+    "gpt-6-luna": ModelPrice(input=0.10, cached_input=0.01, cache_write=0.125, output=0.50),
 }
 
 DEFAULT_AGENTS: dict[AgentName, AgentModelConfig] = {
     AgentName.ASSISTANT: AgentModelConfig(
-        model="claude-haiku-5-5", effort="low", max_output_tokens=1024, token_budget=30_000
+        tier=LlmTier.FAST, reasoning_effort="low", max_output_tokens=2048, token_budget=40_000
     ),
     AgentName.MONITOR: AgentModelConfig(
-        model="claude-haiku-5-5", effort="low", max_output_tokens=1024, max_tool_iterations=1
+        tier=LlmTier.FAST, reasoning_effort="low", max_output_tokens=2048, max_tool_iterations=1
     ),
-    AgentName.OPTIMIZER: AgentModelConfig(model="claude-sonnet-5-5", effort="medium"),
+    AgentName.OPTIMIZER: AgentModelConfig(tier=LlmTier.STANDARD, reasoning_effort="medium"),
     AgentName.CREATIVE: AgentModelConfig(
-        model="claude-sonnet-5-5", effort="medium", max_output_tokens=8192, use_batch=True
+        tier=LlmTier.STANDARD, reasoning_effort="medium", max_output_tokens=8192, use_batch=True
     ),
     AgentName.REPORTER: AgentModelConfig(
-        model="claude-sonnet-5-5", effort="medium", max_output_tokens=4096, use_batch=True
+        tier=LlmTier.STANDARD, reasoning_effort="medium", use_batch=True
     ),
     AgentName.STRATEGIST: AgentModelConfig(
-        model="claude-opus-5-5",
-        effort="high",
+        tier=LlmTier.STRATEGY,
+        reasoning_effort="high",
         max_output_tokens=16_000,
         token_budget=120_000,
         use_batch=True,
@@ -98,12 +107,13 @@ class Settings(BaseSettings):
     global_kill_switch: bool = False
 
     # --- LLM ---
-    anthropic_api_key: SecretStr | None = None
+    openai_api_key: SecretStr | None = None
+    openai_store: bool = False  # never keep parent conversations on OpenAI's side
+    tiers: dict[LlmTier, str] = Field(default_factory=lambda: dict(DEFAULT_TIERS))
     agents: dict[AgentName, AgentModelConfig] = Field(default_factory=lambda: dict(DEFAULT_AGENTS))
     pricing: dict[str, ModelPrice] = Field(default_factory=lambda: dict(DEFAULT_PRICING))
-    batch_discount: float = 0.5  # TO VERIFY: Message Batches API discount
-    usd_to_inr: float = 84.0  # TO VERIFY: set the rate finance wants to use
-    cache_ttl_assistant: str = "5m"  # "5m" or "1h"
+    batch_discount: float = 0.5  # OpenAI Batch API: 50 % of Standard, 24 h window
+    usd_to_inr: float = 84.0  # placeholder default; set the real rate via USD_TO_INR
     llm_budget_alert_pct: int = 80
 
     # --- external API versions (TO VERIFY against current docs) ---
@@ -126,8 +136,14 @@ class Settings(BaseSettings):
     # --- SLAs ---
     first_response_sla_seconds: int = 60
 
+    # --- demo ---
+    demo_mode: bool = False  # enables /demo/chat; never sends real WhatsApp messages
+
     def agent(self, name: AgentName) -> AgentModelConfig:
         return self.agents[name]
+
+    def model_for(self, name: AgentName) -> str:
+        return self.tiers[self.agents[name].tier]
 
     def price_for(self, model: str) -> ModelPrice:
         try:

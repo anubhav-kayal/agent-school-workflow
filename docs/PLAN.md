@@ -26,14 +26,14 @@ Each commit: 150–250 changed lines (hard max 300; lockfiles, generated migrati
 5. Compact pre-computed JSON summaries; token budget and max tool iterations per run.
 6. Webhooks persist + enqueue + 200 fast; incremental metric sync with upserts; daily rollups for dashboards.
 
-## LLM provider: OpenAI (proposal, awaiting approval)
+## LLM provider: OpenAI (approved 2026-11-01)
 
 Sources: https://developers.openai.com/api/docs/pricing ; model pages under
 https://developers.openai.com/api/docs/models/ (read 2026-11-01). Prices USD per 1M tokens, Standard tier.
 
 | Tier | Used by | Proposed model | Input | Cached input | Cache write (30m) | Output |
 |---|---|---|---|---|---|---|
-| tier_strategy | Strategist (Batch) | `gpt-6-astra` | 10.00 | 1.00 | 12.50 | 50.00 |
+| tier_strategy | Strategist (Batch) | `gpt-6.1-sol` (Astra declined to save cost) | 2.00 | 0.10 | 2.50 | 10.00 |
 | tier_standard | Optimizer, Creative, Reporter | `gpt-6.1-sol` | 2.00 | 0.10 | 2.50 | 10.00 |
 | tier_fast | Assistant, Monitor triage | `gpt-6-luna` | 0.10 | 0.01 | 0.125 | 0.50 |
 | (fallback for tier_fast if Hindi < 90 %) | Assistant | `gpt-6.1-terra` | 1.00 | 0.05 | 1.25 | 5.00 |
@@ -166,7 +166,7 @@ https://developers.openai.com/api/docs/models/ (read 2026-11-01). Prices USD per
 3. Report email provider (assumed generic SMTP)?
 4. Exact pricing numbers and the USD→INR rate to use.
 5. Hosting region (AWS ap-south-1 vs GCP asia-south1) — no infra code now.
-6. Approve the OpenAI tier → model mapping above.
+6. ~~OpenAI tier mapping~~ approved: strategy and standard = gpt-6.1-sol, fast = gpt-6-luna.
 
 ## To verify (API details, checked against current docs before each adapter)
 
