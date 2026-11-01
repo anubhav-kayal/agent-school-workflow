@@ -30,3 +30,4 @@
 - feat(agents): tool loop (iteration cap, token budget, transient retries, terminal tools) + agent_runs logging with USD/INR cost. Next: assistant tools + prompt.
 - feat(assistant): 6 strict tools (verified-only facts, ≤3 slots offered, booking, language, escalation, not-interested) + en/hi/hinglish language hint. Next: assistant prompt + agent.
 - feat(assistant): system prompt (facts-only, escalation, en/hi/hinglish, ≤60 words, injection-safe) + agent (cached school KB prefix, history, language hint, slot buttons, fallback+escalation on LLM error). Fix: loop snapshots items per request. Next: inbound message handling + counselor alerts.
+- feat(counselor): alert template with 4 status quick-reply payloads; counselor taps → lead_events (idempotent, only the school's counselors). Next: inbound conversation handler.

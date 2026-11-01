@@ -110,19 +110,30 @@ class WhatsAppAdapter:
         return await self.transport.send(_envelope(to, "interactive", interactive))
 
     async def send_template(
-        self, to: Recipient, name: str, language: str, variables: list[str]
+        self,
+        to: Recipient,
+        name: str,
+        language: str,
+        variables: list[str],
+        button_payloads: list[str] | None = None,
     ) -> str:
         """Business-initiated message; allowed outside the window, never after opt-out."""
         self._check_reachable(to)
         if (name, language) not in self.approved_templates:
             raise TemplateNotApprovedError(f"template {name}/{language} is not approved")
-        template = {
-            "name": name,
-            "language": {"code": language},
-            "components": [
-                {"type": "body", "parameters": [{"type": "text", "text": v} for v in variables]}
-            ],
-        }
+        components: list[dict[str, Any]] = [
+            {"type": "body", "parameters": [{"type": "text", "text": v} for v in variables]}
+        ]
+        for index, payload in enumerate(button_payloads or []):
+            components.append(
+                {
+                    "type": "button",
+                    "sub_type": "quick_reply",
+                    "index": str(index),
+                    "parameters": [{"type": "payload", "payload": payload}],
+                }
+            )
+        template = {"name": name, "language": {"code": language}, "components": components}
         return await self.transport.send(_envelope(to, "template", template))
 
 
