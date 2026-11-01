@@ -53,3 +53,4 @@
 - fix(language): Hindi = Devanagari with Hindi words, Hinglish = Hindi grammar in Roman script; translate KB wording (amounts/names exact); chosen preference overrides message language; evals measure Devanagari share + Hinglish Hindi-word share; 20/20 on gpt-6-luna.
 - fix(language): conversational Hindi (एडमिशन फीस, साल की, क्लास; no शुल्क/प्रति वर्ष), 'we' school voice (no gendered verbs), Hindi self-check for stray English; formality evals. 20/20, Hindi set 3/3 repeat runs.
 - ci: bump checkout v7 / setup-uv v10 (Node 20 deprecation warning). Repo pushed; CI green.
+- docs: README (what it does, quick start, commands, design rules, layout, config, roadmap).

@@ -36,7 +36,7 @@ seed: ## Load fake demo data
 	@if [ -f app/seed.py ]; then $(RUN) python -m app.seed; \
 	else echo "seed arrives in M1"; fi
 
-evals: ## Run LLM evals (calls the real Claude API; never in CI)
+evals: ## Run LLM evals (calls the real OpenAI API; costs money; never in CI)
 	@if [ -f evals/runner.py ]; then $(RUN) python -m evals.runner --tier $${TIER:-tier_fast}; \
 	else echo "evals arrive in M2"; fi
 
