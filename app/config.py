@@ -133,6 +133,9 @@ class Settings(BaseSettings):
     google_ads_refresh_token: SecretStr | None = None
     google_ads_login_customer_id: str | None = None
 
+    # "name:lang" entries Meta has approved; real sends of anything else are refused.
+    whatsapp_approved_templates: list[str] = Field(default_factory=list)
+
     # --- SLAs ---
     first_response_sla_seconds: int = 60
 
