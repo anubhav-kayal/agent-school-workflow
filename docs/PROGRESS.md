@@ -28,3 +28,4 @@
 - feat(llm): provider-neutral LLM interface + OpenAIProvider (Responses API, strict tools, store=false, no sampling params); httpx2 MockTransport tests; session-wide guard that fails any test reaching a non-loopback address. Next: agent base loop + cost logging.
 - feat(llm): cost estimation (cached/cache-write/long-context/batch, USD→INR) + scripted fake provider for tests. Next: agent tool loop + agent_runs logging.
 - feat(agents): tool loop (iteration cap, token budget, transient retries, terminal tools) + agent_runs logging with USD/INR cost. Next: assistant tools + prompt.
+- feat(assistant): 6 strict tools (verified-only facts, ≤3 slots offered, booking, language, escalation, not-interested) + en/hi/hinglish language hint. Next: assistant prompt + agent.
