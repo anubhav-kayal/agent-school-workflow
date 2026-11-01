@@ -92,7 +92,7 @@ async def test_language_asked_once_then_preference_applied(db: AsyncSession) -> 
     out = await handle_parent_message(db, deps, lead, "Hinglish", "lang:hinglish", "wamid.L2", NOW)
     assert out.route == "set_language" and lead.language.value == "hinglish"
     assert lead.language_confirmed_at == NOW
-    assert transport.to(PARENT)[-1]["text"]["body"].startswith("Theek hai")
+    assert transport.to(PARENT)[-1]["text"]["body"].startswith("Theek hai, ab se hum Hinglish")
 
     await handle_parent_message(db, deps, lead, "bus?", None, "wamid.L3", NOW)
     assert transport.to(PARENT)[-1]["type"] == "text"  # not asked again

@@ -27,6 +27,7 @@ scenarios:
       contains_any: ["65,000"]
       language: hi
       devanagari_min: 0.9
+      must_not_contain: ["शुल्क", "दाखिला", "प्रति वर्ष", "कक्षा", "वार्षिक"]
       escalate: false
       max_words: 80
 
@@ -171,4 +172,5 @@ scenarios:
       contains_any: ["85,000"]
       language: hi
       devanagari_min: 0.9
+      must_not_contain: ["शुल्क", "दाखिला", "प्रति वर्ष", "कक्षा", "वार्षिक"]
       language_buttons: false

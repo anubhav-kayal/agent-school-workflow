@@ -51,3 +51,4 @@
 - fix(assistant): tell the model TODAY (IST) in the per-turn tail (not the cached prefix) + prompt rule to pass named days to get_visit_slots; evals check offered slot labels (2 named-day scenarios).
 - feat(language): ask English/हिंदी/Hinglish preference once (buttons on first reply without other buttons, no LLM); lang:* taps set + confirm preference; leads.language_asked_at/confirmed_at (+migration).
 - fix(language): Hindi = Devanagari with Hindi words, Hinglish = Hindi grammar in Roman script; translate KB wording (amounts/names exact); chosen preference overrides message language; evals measure Devanagari share + Hinglish Hindi-word share; 20/20 on gpt-6-luna.
+- fix(language): conversational Hindi (एडमिशन फीस, साल की, क्लास; no शुल्क/प्रति वर्ष), 'we' school voice (no gendered verbs), Hindi self-check for stray English; formality evals. 20/20, Hindi set 3/3 repeat runs.

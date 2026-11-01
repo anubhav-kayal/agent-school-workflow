@@ -27,9 +27,10 @@ LANGUAGE_BUTTONS = [
 ]
 LANGUAGE_SET_TEXT = {
     "en": "Sure, I'll reply in English from now on. How can I help you?",
-    "hi": "ठीक है, अब से मैं हिंदी में जवाब दूँगा। बताइए, मैं आपकी क्या मदद करूँ?",
+    "hi": "ठीक है, अब से हम हिंदी में जवाब देंगे। बताइए, हम आपकी क्या मदद कर सकते हैं?",
     "hinglish": (
-        "Theek hai, ab se main Hinglish mein jawab doonga. Bataiye, main aapki kya madad karoon?"
+        "Theek hai, ab se hum Hinglish mein jawab denge. "
+        "Bataiye, hum aapki kya madad kar sakte hain?"
     ),
 }
 BOOKED_TEXT = {
