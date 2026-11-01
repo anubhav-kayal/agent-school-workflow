@@ -19,3 +19,4 @@
 - feat(formatting): Indian number grouping, ₹ lakh/crore, IST slot labels (en/hi, ≤20 chars). Next: WhatsApp adapter + 24h window.
 - feat(adapters): WhatsApp adapter policy (opt-out, 24h window, approved templates, button limits) + fake transport. Next: Cloud API transport.
 - feat(adapters): WhatsApp Cloud API transport (retry/backoff on 429/5xx, re-engagement error mapping), respx tests. Next: LLM provider (OpenAI).
+- feat(leads): idempotent lead intake (+conversation, created event) and first-response template with first_response_at, no LLM. Next: LLM provider interface.
