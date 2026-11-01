@@ -25,3 +25,4 @@
 - docs(plan): OpenAI tier → model proposal with prices (awaiting approval).
 - refactor(config): switch to OpenAI — LLM tiers (fast=gpt-6-luna, standard/strategy=gpt-6.1-sol), OpenAI pricing w/ long-context multipliers, OPENAI_API_KEY, store=false, DEMO_MODE; anthropic removed. Next: ARCHITECTURE OpenAI section.
 - docs(architecture): OpenAI Responses API choice, caching, batch fallback, parameter behaviour, data handling (with doc links).
+- feat(llm): provider-neutral LLM interface + OpenAIProvider (Responses API, strict tools, store=false, no sampling params); httpx2 MockTransport tests; session-wide guard that fails any test reaching a non-loopback address. Next: agent base loop + cost logging.
