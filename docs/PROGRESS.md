@@ -44,3 +44,4 @@
 - feat(reminders): day-before (18:00 IST) + morning-of (max(08:00, -2h)) templates, sent once, never to opted-out/deleted leads (tested). Next: arq worker.
 - feat(jobs): arq worker — first response, Meta lead intake (+first template in same job), inbound WhatsApp, reminders cron /15min; DRY_RUN → logging transport; no API key → polite fallback + escalation. Next: DPDP lead deletion.
 - feat(privacy): DPDP erase-lead admin action (CLI) — scrub PII + message text, opt out, free booked seat, keep anonymous funnel, audit log. Next: end-to-end integration test.
+- test(integration): lead → template (no LLM) → fees (KB) → slot button → counselor alert → 'Visited' tap → lead_event pending CAPI sync, all via real webhooks + worker jobs. Next: evals.
