@@ -13,3 +13,4 @@
 - feat(models): kb_facts, creatives, agent_runs, proposed_actions, audit_log, reports; ads.creative_id. Next: Alembic + initial migration.
 - chore(db): Alembic async env + initial migration (round-trip verified, alembic check clean). Next: Pydantic schemas.
 - feat(schemas): Pydantic v2 schemas (Indian mobile → E.164, paise, consent required, extra fields forbidden). Next: demo seed.
+- feat(seed): idempotent fake demo school (users, ad accounts, 11 KB facts incl. 1 unverified, 14 days of IST slots). Next: model integrity tests.
