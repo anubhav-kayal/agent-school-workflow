@@ -41,3 +41,4 @@
 - feat(webhooks): Meta leadgen webhook (challenge, signature 401, enqueue with metalead:<id> job id) + ingest service (page→school, replay skips Graph call, invalid phones dropped). Next: WhatsApp inbound webhook.
 - feat(adapters): WhatsApp webhook parser (text, button_reply/list_reply, template quick-reply payloads, statuses; media ignored). Next: WhatsApp webhook + processing.
 - feat(webhooks): WhatsApp webhook (challenge, signature, statuses inline, messages queued as wa:<wamid>) + processing (counselor taps vs parents, unknown parent → whatsapp lead, conversation handler). Next: arq worker + reminders.
+- feat(reminders): day-before (18:00 IST) + morning-of (max(08:00, -2h)) templates, sent once, never to opted-out/deleted leads (tested). Next: arq worker.
