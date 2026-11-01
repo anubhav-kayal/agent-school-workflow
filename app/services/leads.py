@@ -13,6 +13,7 @@ from app.adapters.whatsapp import Recipient, WhatsAppAdapter, WhatsAppPolicyErro
 from app.models import Conversation, Lead, LeadEvent, Message, School
 from app.models.enums import Actor, Direction, Language, LeadEventType, LeadStatus
 from app.schemas.lead import LeadCreate
+from app.services.templates import QUICK_REPLIES, render
 
 FIRST_TEMPLATE = "enquiry_first_response"
 
@@ -102,7 +103,12 @@ async def send_first_response(db: AsyncSession, lead: Lead, wa: WhatsAppAdapter)
             template_name=FIRST_TEMPLATE,
             wa_message_id=wamid,
             status="sent",
-            payload={"language": language, "variables": variables},
+            body=render(FIRST_TEMPLATE, language, variables),
+            payload={
+                "language": language,
+                "variables": variables,
+                "buttons": QUICK_REPLIES.get((FIRST_TEMPLATE, language), []),
+            },
         )
     )
     db.add(

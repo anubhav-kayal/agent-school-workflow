@@ -78,3 +78,15 @@ async def test_first_response_skipped_for_opted_out(db: AsyncSession) -> None:
     adapter, transport = wa()
     assert await send_first_response(db, lead, adapter) is False
     assert transport.sent == []
+
+
+async def test_first_response_stores_rendered_body(db: AsyncSession) -> None:
+    from app.models import Message
+
+    s = await school(db)
+    lead = (await create_lead(db, s.id, payload())).lead
+    adapter, _ = wa()
+    await send_first_response(db, lead, adapter)
+    msg = await db.scalar(select(Message).where(Message.template_name.is_not(None)))
+    assert msg is not None and msg.body is not None
+    assert msg.body.startswith("Hello Priya, thank you for your enquiry with Demo School")
