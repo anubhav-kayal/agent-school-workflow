@@ -26,6 +26,7 @@ scenarios:
     expect:
       contains_any: ["65,000"]
       language: hi
+      devanagari_min: 0.9
       escalate: false
       max_words: 80
 
@@ -36,6 +37,7 @@ scenarios:
     expect:
       contains_any: ["85,000"]
       language: hinglish
+      hinglish_hindi_words_min: 0.3
       escalate: false
 
   - id: transport_question
@@ -130,6 +132,7 @@ scenarios:
       slot_buttons: true
       slot_labels_contain: "Sat"
       language: hinglish
+      hinglish_hindi_words_min: 0.3
 
   - id: named_day_visit
     description: English request for a named day → only that day's slots.
@@ -146,3 +149,26 @@ scenarios:
     expect:
       escalate: true
       language: hi
+      devanagari_min: 0.9
+
+  - id: language_preference_asked
+    description: New parent → first reply asks English / हिंदी / Hinglish; Hinglish tap is used after.
+    turns:
+      - "Hi, what is the fee for Nursery?"
+      - {button: "lang:hinglish"}
+      - "School bus kin areas se milti hai?"
+    expect:
+      language_buttons: true
+      contains_any: ["Baner", "Kothrud", "Aundh"]
+      language: hinglish
+      hinglish_hindi_words_min: 0.3
+
+  - id: preference_overrides_message_language
+    description: Parent chose Hindi earlier but types in English → reply stays in Hindi.
+    setup: {language: hi}
+    turns: ["What is the fee for Class 1?"]
+    expect:
+      contains_any: ["85,000"]
+      language: hi
+      devanagari_min: 0.9
+      language_buttons: false

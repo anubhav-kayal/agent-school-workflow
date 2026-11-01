@@ -57,6 +57,7 @@ async def setup_lead(db: AsyncSession, scenario: dict[str, Any], now: datetime) 
         grade_interest=setup.get("grade", "Class 1"),
         language=Language(setup.get("language", "en")),
         consent=True,
+        language_confirmed_at=now if "language" in setup else None,
         status=LeadStatus.CONTACTED,
         first_response_at=now,
     )
@@ -99,9 +100,11 @@ async def run_scenario(db: AsyncSession, deps: Deps, scenario: dict[str, Any]) -
             body = payload.get("text", {}).get("body") or payload["interactive"]["body"]["text"]
             t.replies.append(body)
             buttons = payload.get("interactive", {}).get("action", {}).get("buttons", [])
-            last_buttons = [b["reply"]["id"] for b in buttons] or last_buttons
-            t.buttons_offered += len(buttons)
-            t.slot_labels += [b["reply"]["title"] for b in buttons]
+            slots = [b["reply"] for b in buttons if b["reply"]["id"].startswith("slot:")]
+            t.language_buttons |= any(b["reply"]["id"].startswith("lang:") for b in buttons)
+            last_buttons = [b["id"] for b in slots] or last_buttons
+            t.buttons_offered += len(slots)
+            t.slot_labels += [b["title"] for b in slots]
     runs = (await db.scalars(select(AgentRun).where(AgentRun.id > first_run_id))).all()
     t.tools = [tool for r in runs for tool in r.output.get("tools", [])]
     t.cost_usd = sum(float(r.cost_usd) for r in runs)

@@ -89,11 +89,16 @@ async def run_assistant(
     started = time.monotonic()
     cfg = settings.agent(AgentName.ASSISTANT)
     school = await db.get_one(School, lead.school_id)
-    language = detect_language(latest_text)
+    if lead.language_confirmed_at is not None:
+        language = lead.language.value
+        language_line = f"LANGUAGE: {language} (chosen by the parent; always reply in it)"
+    else:
+        language = detect_language(latest_text)
+        language_line = f"LANGUAGE_HINT: {language}"
     items = [
         provider.context_item(await school_context(db, school)),
         *await history_items(db, provider, conv),
-        provider.context_item(f"{today_line(now)}\nLANGUAGE_HINT: {language}"),
+        provider.context_item(f"{today_line(now)}\n{language_line}"),
     ]
     request = LLMRequest(
         model=settings.model_for(AgentName.ASSISTANT),

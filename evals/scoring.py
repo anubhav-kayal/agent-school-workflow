@@ -6,7 +6,24 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
-from app.agents.language import detect_language
+from app.agents.language import detect_language, devanagari_share, hindi_word_share
+
+KEEP_ENGLISH = frozenset(
+    {
+        "cbse",
+        "sunrise",
+        "demo",
+        "public",
+        "school",
+        "pune",
+        "am",
+        "pm",
+        "kothrud",
+        "baner",
+        "aundh",
+        "pashan",
+    }
+)  # names from the demo KB
 
 
 @dataclass
@@ -20,6 +37,7 @@ class Transcript:
     booked: bool = False
     buttons_offered: int = 0
     slot_labels: list[str] = field(default_factory=list)
+    language_buttons: bool = False
     cost_usd: float = 0.0
     cost_inr: float = 0.0
     llm_calls: int = 0
@@ -64,6 +82,29 @@ def score(expect: dict[str, Any], t: Transcript) -> list[Check]:
         checks.append(Check(f"route {expect['route']}", expect["route"] in t.routes, str(t.routes)))
     if "no_reply" in expect:
         checks.append(Check("sends nothing", (not t.replies) == expect["no_reply"], str(t.replies)))
+    if "devanagari_min" in expect and last:
+        share = devanagari_share(last, KEEP_ENGLISH)
+        checks.append(
+            Check(
+                f"Hindi in Devanagari ≥ {expect['devanagari_min']}",
+                share >= expect["devanagari_min"],
+                f"{share:.2f}: {last[:80]}",
+            )
+        )
+    if "hinglish_hindi_words_min" in expect and last:
+        share = hindi_word_share(last, KEEP_ENGLISH)
+        ok = share >= expect["hinglish_hindi_words_min"] and devanagari_share(last) == 0
+        checks.append(
+            Check(
+                f"Hinglish = Hindi in Roman ≥ {expect['hinglish_hindi_words_min']}",
+                ok,
+                f"{share:.2f}: {last[:80]}",
+            )
+        )
+    if "language_buttons" in expect:
+        checks.append(
+            Check("asks language preference", t.language_buttons == expect["language_buttons"], "")
+        )
     if "slot_labels_contain" in expect:
         want = str(expect["slot_labels_contain"])
         ok = bool(t.slot_labels) and all(want in label for label in t.slot_labels)
