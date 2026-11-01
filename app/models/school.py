@@ -27,6 +27,9 @@ class School(IdMixin, TimestampMixin, Base):
     monthly_budget_cap_paise: Mapped[int | None] = mapped_column(BigInteger)
     daily_budget_cap_paise: Mapped[int | None] = mapped_column(BigInteger)
     monthly_llm_budget_usd: Mapped[float | None] = mapped_column(Numeric(10, 2))
+    # Webhook routing: which Facebook page / WhatsApp number belongs to this school.
+    meta_page_id: Mapped[str | None] = mapped_column(String(64), unique=True)
+    whatsapp_phone_number_id: Mapped[str | None] = mapped_column(String(64), unique=True)
     brand: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)  # logo path, colours
 
     guardrails: Mapped[GuardrailConfig | None] = relationship(

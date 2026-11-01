@@ -61,6 +61,8 @@ async def upsert_school(db: AsyncSession) -> int:
         .values(
             name="Sunrise Demo Public School",
             slug=SLUG,
+            meta_page_id="000000000000001",  # fake ids for webhook routing
+            whatsapp_phone_number_id="000000000000002",
             city="Pune",
             timezone="Asia/Kolkata",
             languages=["en", "hi", "hinglish"],
@@ -69,7 +71,14 @@ async def upsert_school(db: AsyncSession) -> int:
             monthly_llm_budget_usd=50,
             brand={"primary": "#0B5FA5", "secondary": "#F2A900", "logo": "brand/demo-logo.png"},
         )
-        .on_conflict_do_update(index_elements=["slug"], set_={"name": "Sunrise Demo Public School"})
+        .on_conflict_do_update(
+            index_elements=["slug"],
+            set_={
+                "name": "Sunrise Demo Public School",
+                "meta_page_id": "000000000000001",
+                "whatsapp_phone_number_id": "000000000000002",
+            },
+        )
     )
     school_id = (await db.execute(stmt.returning(School.id))).scalar_one()
     await db.execute(insert(GuardrailConfig).values(school_id=school_id).on_conflict_do_nothing())

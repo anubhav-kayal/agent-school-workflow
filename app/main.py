@@ -13,6 +13,7 @@ from app import __version__
 from app.config import get_settings
 from app.db import get_engine, ping_database
 from app.web.routes import demo
+from app.webhooks import forms
 
 
 async def ping_redis() -> bool:
@@ -50,6 +51,7 @@ def create_app() -> FastAPI:
         return {"status": "ok" if healthy else "degraded", "checks": checks}
 
     app.include_router(demo.router)
+    app.include_router(forms.router)
     return app
 
 
