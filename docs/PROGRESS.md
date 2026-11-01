@@ -12,3 +12,4 @@
 - feat(models): leads (consent, opt-out, deletion, attribution), lead_events (idempotency key), conversations, messages, visit_slots, visit_bookings. Next: KB, creatives, agent runs, proposals, audit, reports.
 - feat(models): kb_facts, creatives, agent_runs, proposed_actions, audit_log, reports; ads.creative_id. Next: Alembic + initial migration.
 - chore(db): Alembic async env + initial migration (round-trip verified, alembic check clean). Next: Pydantic schemas.
+- feat(schemas): Pydantic v2 schemas (Indian mobile → E.164, paise, consent required, extra fields forbidden). Next: demo seed.
