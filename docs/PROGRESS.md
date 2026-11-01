@@ -17,3 +17,4 @@
 - test(models): lead hard-delete cascade, slot delete protection, migration/model drift check on scratch DB. M1 complete. Next (after go-ahead): M2 leads + WhatsApp assistant.
 - docs: WhatsApp template drafts (7 templates, en + hi, variables, buttons, expected category) for Meta submission. Next: INR/IST formatting.
 - feat(formatting): Indian number grouping, ₹ lakh/crore, IST slot labels (en/hi, ≤20 chars). Next: WhatsApp adapter + 24h window.
+- feat(adapters): WhatsApp adapter policy (opt-out, 24h window, approved templates, button limits) + fake transport. Next: Cloud API transport.
