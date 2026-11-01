@@ -27,3 +27,4 @@
 - docs(architecture): OpenAI Responses API choice, caching, batch fallback, parameter behaviour, data handling (with doc links).
 - feat(llm): provider-neutral LLM interface + OpenAIProvider (Responses API, strict tools, store=false, no sampling params); httpx2 MockTransport tests; session-wide guard that fails any test reaching a non-loopback address. Next: agent base loop + cost logging.
 - feat(llm): cost estimation (cached/cache-write/long-context/batch, USD→INR) + scripted fake provider for tests. Next: agent tool loop + agent_runs logging.
+- feat(agents): tool loop (iteration cap, token budget, transient retries, terminal tools) + agent_runs logging with USD/INR cost. Next: assistant tools + prompt.
