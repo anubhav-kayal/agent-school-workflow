@@ -5,3 +5,4 @@
 - feat(config): typed settings, per-agent model/effort/budgets, pricing (TO VERIFY), .env.example. Next: FastAPI app + /health.
 - feat(app): FastAPI factory, /health + /health/ready, async engine/session. Next: docker-compose + Makefile.
 - chore: docker-compose (postgres 16, redis 7, test DB) + Makefile. Next: CI workflow.
+- ci: GitHub Actions lint + test with Postgres/Redis services. M0 complete. Next: M1 models.
