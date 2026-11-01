@@ -120,6 +120,12 @@ Source: https://developers.openai.com/api/docs/guides/your-data.md (read 2026-11
 - Central Redis token-bucket rate limiter per platform and ad account; exponential backoff on throttling; Google Ads daily ops counter.
 - Insights sync is incremental (re-pull last 3 days for attribution restatement) with upserts. `metrics_daily` rollups feed the dashboard and summaries.
 
+## Demo mode
+`make demo` runs `/demo/chat` with `DEMO_MODE=true`.
+- It uses the seeded demo school and the real assistant (OpenAI).
+- WhatsApp goes to an in-memory fake transport.
+- The page is labelled "Demo — sample school data". With demo mode off, every `/demo` route returns 404.
+
 ## Safety rails
 - `DRY_RUN=true` globally and per school; the executor logs exactly what it would do and calls nothing.
 - Kill switch (global + per school) blocks all writes.

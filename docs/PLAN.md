@@ -175,4 +175,7 @@ https://developers.openai.com/api/docs/models/ (read 2026-11-01). Prices USD per
 - Meta Conversions API for CRM: event names per lead stage, `lead_id` placement, `action_source` = `system_generated`.
 - Google Ads API version; GAQL fields for campaign metrics; `CampaignBudgetService` mutate; offline conversion upload with `gclid` vs enhanced conversions for leads (hashed email/phone); daily operations limits.
 - WhatsApp Cloud API: template send payload, interactive reply buttons (max 3), list messages (max 10 rows), 24-hour window rules, status webhooks.
-- Anthropic: minimum cacheable prefix per model, cache TTL pricing, Batch discount, per-model prices.
+- OpenAI: re-check prices / model IDs before go-live; whether `in` data residency allows Responses with `store=false`; ZDR eligibility.
+- WhatsApp: error code 131047 = re-engagement (outside 24 h window); template quick-reply `payload` component shape; list-reply webhook shape; template header/footer limits.
+- Meta Graph: Bearer header accepted for lead reads (we avoid `access_token` in URLs); lead `field_data` names on the school's actual forms (grade question naming).
+- Website form endpoint has no spam protection yet (captcha / rate limit before go-live).

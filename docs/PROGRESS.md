@@ -46,3 +46,4 @@
 - feat(privacy): DPDP erase-lead admin action (CLI) — scrub PII + message text, opt out, free booked seat, keep anonymous funnel, audit log. Next: end-to-end integration test.
 - test(integration): lead → template (no LLM) → fees (KB) → slot button → counselor alert → 'Visited' tap → lead_event pending CAPI sync, all via real webhooks + worker jobs. Next: evals.
 - feat(evals): runner (real model, per-scenario rolled-back transaction, --tier, JSON results with pass rate + avg cost/conversation USD/INR) + deterministic scoring + 17 assistant scenarios (incl. the 15 required). Next: run evals (needs OPENAI_API_KEY).
+- docs: To-verify items for OpenAI/WhatsApp/Meta specifics found during M2; demo mode in ARCHITECTURE. M2 code complete; evals await OPENAI_API_KEY.
