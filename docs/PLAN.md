@@ -26,6 +26,27 @@ Each commit: 150–250 changed lines (hard max 300; lockfiles, generated migrati
 5. Compact pre-computed JSON summaries; token budget and max tool iterations per run.
 6. Webhooks persist + enqueue + 200 fast; incremental metric sync with upserts; daily rollups for dashboards.
 
+## LLM provider: OpenAI (proposal, awaiting approval)
+
+Sources: https://developers.openai.com/api/docs/pricing ; model pages under
+https://developers.openai.com/api/docs/models/ (read 2026-11-01). Prices USD per 1M tokens, Standard tier.
+
+| Tier | Used by | Proposed model | Input | Cached input | Cache write (30m) | Output |
+|---|---|---|---|---|---|---|
+| tier_strategy | Strategist (Batch) | `gpt-6-astra` | 10.00 | 1.00 | 12.50 | 50.00 |
+| tier_standard | Optimizer, Creative, Reporter | `gpt-6.1-sol` | 2.00 | 0.10 | 2.50 | 10.00 |
+| tier_fast | Assistant, Monitor triage | `gpt-6-luna` | 0.10 | 0.01 | 0.125 | 0.50 |
+| (fallback for tier_fast if Hindi < 90 %) | Assistant | `gpt-6.1-terra` | 1.00 | 0.05 | 1.25 | 5.00 |
+
+- Batch API and Flex: 50 % of Standard, 24 h completion window.
+- Long context: prompts over 272K input tokens pay 2x input/cache and 1.5x output for the whole request. Our prompts stay far below this.
+- All four models: 1.05M context, 128K max output.
+- Rough cost per assistant conversation (3 model calls, ~3K cached prefix + ~1.5K fresh input + ~300 output per call):
+  - Luna: ≈ $0.0008 (≈ ₹0.07)
+  - Terra: ≈ $0.009 (≈ ₹0.8)
+  - Sol: ≈ $0.018 (≈ ₹1.5)
+  - Evals will measure the real numbers.
+
 ## Milestones and commits
 
 ### M0 Scaffold
@@ -145,7 +166,7 @@ Each commit: 150–250 changed lines (hard max 300; lockfiles, generated migrati
 3. Report email provider (assumed generic SMTP)?
 4. Exact pricing numbers and the USD→INR rate to use.
 5. Hosting region (AWS ap-south-1 vs GCP asia-south1) — no infra code now.
-6. Pre-approved WhatsApp template names/languages per school?
+6. Approve the OpenAI tier → model mapping above.
 
 ## To verify (API details, checked against current docs before each adapter)
 
