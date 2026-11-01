@@ -38,3 +38,4 @@
 - fix(demo): plain form posts for start/reset (htmx swapped the full page into the panel), unique fake wamids across restarts, inline missing-key notice. Verified in a browser. Next: reminders.
 - feat(webhooks): website form endpoint (consent required, 202) + Enqueuer protocol (arq, job-id dedupe); schools.meta_page_id / whatsapp_phone_number_id (+migration, fake seed ids). Next: Meta leadgen adapter.
 - feat(adapters): Meta leadgen — X-Hub-Signature-256 check, webhook parsing, Graph lead fetch (token in header) + fake. Next: leadgen webhook route + job.
+- feat(webhooks): Meta leadgen webhook (challenge, signature 401, enqueue with metalead:<id> job id) + ingest service (page→school, replay skips Graph call, invalid phones dropped). Next: WhatsApp inbound webhook.
