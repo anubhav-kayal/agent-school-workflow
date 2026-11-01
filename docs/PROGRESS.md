@@ -37,3 +37,4 @@
 - feat(demo): WhatsApp-style chat UI, counselor panel with 4 status buttons, live agent activity (HTMX polling), 'Demo — sample school data' banner; `make demo`; tests (404 when off, no-LLM first message, slot buttons, no key, counselor taps). Next: reminders.
 - fix(demo): plain form posts for start/reset (htmx swapped the full page into the panel), unique fake wamids across restarts, inline missing-key notice. Verified in a browser. Next: reminders.
 - feat(webhooks): website form endpoint (consent required, 202) + Enqueuer protocol (arq, job-id dedupe); schools.meta_page_id / whatsapp_phone_number_id (+migration, fake seed ids). Next: Meta leadgen adapter.
+- feat(adapters): Meta leadgen — X-Hub-Signature-256 check, webhook parsing, Graph lead fetch (token in header) + fake. Next: leadgen webhook route + job.
