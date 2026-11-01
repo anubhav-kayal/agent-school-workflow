@@ -35,8 +35,8 @@ jobs:
       REDIS_URL: redis://localhost:6379/0
       DRY_RUN: "true"
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
         with:
           enable-cache: true
       - name: Install
