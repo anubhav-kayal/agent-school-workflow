@@ -82,7 +82,10 @@ class WhatsAppAdapter:
             raise ValueError(f"reply buttons must be 1..{MAX_REPLY_BUTTONS}")
         action = {
             "buttons": [
-                {"type": "reply", "reply": {"id": b.id, "title": b.title[:MAX_BUTTON_TITLE].rstrip()}}
+                {
+                    "type": "reply",
+                    "reply": {"id": b.id, "title": b.title[:MAX_BUTTON_TITLE].rstrip()},
+                }
                 for b in buttons
             ]
         }
