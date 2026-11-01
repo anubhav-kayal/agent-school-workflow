@@ -50,9 +50,9 @@
 | Parent taps a visit-slot button | Router → `book_visit` | No |
 | Counselor taps status button | Router → `lead_events` | No |
 | Reminders | Scheduled template sends | No |
-| Parent free-text question | Assistant agent (Haiku) | Yes |
+| Parent free-text question | Assistant agent (tier_fast) | Yes |
 | Hourly monitor, no rule fired | Code only | No |
-| Hourly monitor, rule fired | Haiku writes severity + alert | Yes |
+| Hourly monitor, rule fired | tier_fast model writes severity + alert | Yes |
 | Optimizer, too little data / all in learning / summary unchanged | Pre-gate logs `no_action` | No |
 
 ### 2. Prompt caching (OpenAI)
