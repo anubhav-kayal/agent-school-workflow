@@ -33,3 +33,4 @@
 - feat(counselor): alert template with 4 status quick-reply payloads; counselor taps → lead_events (idempotent, only the school's counselors). Next: inbound conversation handler.
 - feat(conversation): inbound handler — dedupe, 24h window stamp, opt-out silence, slot buttons booked without LLM, assistant replies with buttons, counselor alerts on booking/escalation. Next: demo mode.
 - feat(templates): template body registry mirroring the docs; first response stores rendered body + quick replies (history and UI show real text).
+- feat(demo): /demo routes (DEMO_MODE-gated 404, fake WhatsApp transport, real provider via factory, start/send/counselor/partials) + python-multipart. Next: demo UI templates.

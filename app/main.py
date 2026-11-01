@@ -12,6 +12,7 @@ from redis.asyncio import Redis
 from app import __version__
 from app.config import get_settings
 from app.db import get_engine, ping_database
+from app.web.routes import demo
 
 
 async def ping_redis() -> bool:
@@ -48,6 +49,7 @@ def create_app() -> FastAPI:
             response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
         return {"status": "ok" if healthy else "degraded", "checks": checks}
 
+    app.include_router(demo.router)
     return app
 
 
