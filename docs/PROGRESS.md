@@ -34,3 +34,4 @@
 - feat(conversation): inbound handler — dedupe, 24h window stamp, opt-out silence, slot buttons booked without LLM, assistant replies with buttons, counselor alerts on booking/escalation. Next: demo mode.
 - feat(templates): template body registry mirroring the docs; first response stores rendered body + quick replies (history and UI show real text).
 - feat(demo): /demo routes (DEMO_MODE-gated 404, fake WhatsApp transport, real provider via factory, start/send/counselor/partials) + python-multipart. Next: demo UI templates.
+- feat(demo): WhatsApp-style chat UI, counselor panel with 4 status buttons, live agent activity (HTMX polling), 'Demo — sample school data' banner; `make demo`; tests (404 when off, no-LLM first message, slot buttons, no key, counselor taps). Next: reminders.

@@ -23,6 +23,7 @@ from app.agents.llm import LLMError, LLMProvider
 from app.agents.llm.factory import get_provider
 from app.config import Settings, get_settings
 from app.db import get_session
+from app.formatting import to_ist
 from app.models import AgentRun, Conversation, Lead, LeadEvent, Message, School
 from app.models.enums import Language, LeadEventType, LeadSource
 from app.schemas.lead import LeadCreate
@@ -33,6 +34,7 @@ from app.services.leads import create_lead, send_first_response
 from app.services.templates import ALL_TEMPLATE_KEYS
 
 TEMPLATES = Jinja2Templates(directory=Path(__file__).parents[1] / "templates")
+TEMPLATES.env.filters["ist"] = lambda dt: to_ist(dt).strftime("%H:%M:%S") if dt else ""
 COOKIE = "demo_lead"
 QUICK_TEXT = {"book_visit": "I'd like to book a campus visit", "ask": "I have a question"}
 TRANSPORT = FakeWhatsAppTransport()  # process-wide; demo only

@@ -1,0 +1,22 @@
+{% set last_out = (messages | selectattr("direction", "equalto", "outbound") | list | last) if messages else None %}
+{% for m in messages %}
+  {% set mine = m.direction == "inbound" %}
+  <div class="flex {{ 'justify-end' if mine else 'justify-start' }}">
+    <div class="max-w-[85%] rounded-lg px-3 py-1.5 text-[15px] shadow-sm whitespace-pre-line {{ 'bg-[#d9fdd3]' if mine else 'bg-white' }}">
+      {%- if m.kind == "template" %}<div class="text-[10px] uppercase tracking-wide text-emerald-700 font-semibold">Template · no AI</div>{% endif -%}
+      {{ m.body or "" }}
+      <div class="text-[10px] text-slate-400 text-right mt-0.5">{{ m.created_at | ist }}</div>
+    </div>
+  </div>
+  {% if last_out and m.id == last_out.id and m.payload.get("buttons") and not lead.opted_out_at %}
+  <div class="flex flex-col items-start gap-1 pl-1">
+    {% for b in m.payload["buttons"] %}
+    <button hx-post="/demo/send" hx-vals='{"button_id": "{{ b[0] }}"}' hx-target="#chat" hx-indicator="#typing"
+            class="min-w-[60%] text-center bg-white text-[#027eb5] text-sm font-medium rounded-lg px-3 py-1.5 shadow-sm hover:bg-slate-50">{{ b[1] }}</button>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endfor %}
+{% if lead and lead.opted_out_at %}
+  <div class="text-center text-xs text-slate-600 bg-white/80 rounded-md py-1">Parent opted out. Nothing more will be sent to this number.</div>
+{% endif %}

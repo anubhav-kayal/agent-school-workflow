@@ -2,7 +2,7 @@
 UV ?= uv
 RUN := $(UV) run
 
-.PHONY: help install up down test lint fmt typecheck migrate seed evals run worker
+.PHONY: help install up down test lint fmt typecheck migrate seed evals run worker demo
 
 help: ## Show targets
 	@grep -E '^[a-z-]+:.*##' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "}; {printf "  %-10s %s\n", $$1, $$2}'
@@ -46,3 +46,9 @@ run: ## Start the API with autoreload
 worker: ## Start the arq background worker
 	@if [ -f app/jobs/worker.py ]; then $(RUN) arq app.jobs.worker.WorkerSettings; \
 	else echo "worker arrives in M2"; fi
+
+demo: up install ## One command: services, migrations, seed, then the demo at /demo/chat
+	$(RUN) alembic upgrade head
+	$(RUN) python -m app.seed
+	@echo "\n  Demo: http://localhost:8000/demo/chat  (needs OPENAI_API_KEY in .env)\n"
+	DEMO_MODE=true $(RUN) uvicorn app.main:app --port 8000

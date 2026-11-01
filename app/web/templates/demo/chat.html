@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AdmissionPilot Demo</title>
+  <script src="https://cdn.tailwindcss.com/3.4.5"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: "Noto Sans", "Noto Sans Devanagari", system-ui, sans-serif; }
+    .wa-bg { background-color: #efeae2; background-image: radial-gradient(#d9d2c5 1px, transparent 1px); background-size: 18px 18px; }
+    .htmx-indicator { display: none; } .htmx-request .htmx-indicator, .htmx-request.htmx-indicator { display: flex; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-900 min-h-screen">
+  <div class="bg-amber-400 text-amber-950 text-center text-sm font-semibold py-1.5">
+    Demo — sample school data. No real WhatsApp messages are sent.
+  </div>
+  <header class="max-w-6xl mx-auto px-4 pt-5 pb-3 flex items-center justify-between gap-3">
+    <div>
+      <h1 class="text-xl font-semibold">AdmissionPilot</h1>
+      <p class="text-sm text-slate-500">{{ school.name }}, {{ school.city }} · WhatsApp admission assistant</p>
+    </div>
+    {% if lead %}
+    <form hx-post="/demo/reset"><button class="text-sm px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50">New parent</button></form>
+    {% endif %}
+  </header>
+
+  {% if not has_key %}
+  <div class="max-w-6xl mx-auto px-4"><div class="rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm p-3 mb-3">
+    OPENAI_API_KEY is not set. Add it to <code>.env</code> and restart <code>make demo</code>.
+  </div></div>
+  {% endif %}
+
+  <main class="max-w-6xl mx-auto px-4 pb-8 grid gap-5 md:grid-cols-[minmax(0,420px)_1fr]">
+    <section class="rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white flex flex-col h-[78vh] min-h-[520px]">
+      <div class="bg-[#075e54] text-white px-4 py-3 flex items-center gap-3">
+        <div class="h-9 w-9 rounded-full bg-white/20 grid place-items-center font-semibold">{{ school.name[:1] }}</div>
+        <div><div class="font-semibold leading-tight">{{ school.name }}</div><div class="text-xs text-white/75">Admission assistant</div></div>
+      </div>
+      {% if lead %}
+      <div id="chat" class="wa-bg flex-1 overflow-y-auto p-3 space-y-2"
+           hx-get="/demo/partials/chat" hx-trigger="load, every 4s" hx-swap="innerHTML"></div>
+      <div id="typing" class="htmx-indicator wa-bg px-3 pb-2"><span class="bg-white rounded-lg px-3 py-1.5 text-sm text-slate-500 shadow-sm">typing…</span></div>
+      <form class="bg-[#f0f2f5] p-2 flex gap-2" hx-post="/demo/send" hx-target="#chat" hx-indicator="#typing"
+            hx-on::after-request="this.reset()">
+        <input name="text" autocomplete="off" required placeholder="Type as the parent (English, हिंदी, Hinglish)…"
+               class="flex-1 rounded-full px-4 py-2 text-sm border-0 focus:ring-2 focus:ring-emerald-500 outline-none">
+        <button class="rounded-full bg-[#00a884] text-white px-4 text-sm font-semibold">Send</button>
+      </form>
+      {% else %}
+      <form class="wa-bg flex-1 p-5 flex flex-col justify-center gap-3" hx-post="/demo/start">
+        <div class="bg-white rounded-xl p-4 shadow-sm space-y-3">
+          <p class="text-sm text-slate-600">Simulate a parent submitting an enquiry form. The first reply is an approved template, sent instantly with no AI call.</p>
+          <label class="block text-sm">Parent name<input name="parent_name" value="Priya" required class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"></label>
+          <label class="block text-sm">Grade<select name="grade" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
+            {% for g in ["Nursery", "Class 1", "Class 5", "Class 9"] %}<option>{{ g }}</option>{% endfor %}</select></label>
+          <label class="block text-sm">Template language<select name="language" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
+            <option value="en">English</option><option value="hi">हिंदी</option><option value="hinglish">Hinglish</option></select></label>
+          <button class="w-full rounded-lg bg-[#00a884] text-white py-2 font-semibold">Submit enquiry</button>
+        </div>
+      </form>
+      {% endif %}
+    </section>
+
+    <section id="side" hx-get="/demo/partials/side" hx-trigger="load, every 3s" hx-swap="innerHTML" class="space-y-4"></section>
+  </main>
+  <script>
+    document.body.addEventListener("htmx:afterSwap", (e) => {
+      if (e.detail.target.id === "chat") e.detail.target.scrollTop = e.detail.target.scrollHeight;
+    });
+  </script>
+</body>
+</html>
