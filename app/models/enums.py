@@ -76,3 +76,29 @@ class BookingStatus(StrEnum):
     CANCELLED = "cancelled"
     ATTENDED = "attended"
     NO_SHOW = "no_show"
+
+
+class CreativeStatus(StrEnum):
+    DRAFT = "draft"
+    PENDING_APPROVAL = "pending_approval"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    LIVE = "live"
+
+
+class ActionType(StrEnum):
+    BUDGET_CHANGE = "budget_change"
+    PAUSE = "pause"
+    ACTIVATE = "activate"
+    REQUEST_CREATIVES = "request_creatives"
+    CREATE_AD = "create_ad"
+    NO_ACTION = "no_action"
+
+
+class ActionStatus(StrEnum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    APPLIED = "applied"
+    DRY_RUN = "dry_run"
+    BLOCKED = "blocked"

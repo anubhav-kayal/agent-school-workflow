@@ -10,3 +10,4 @@
 - feat(models): base + naming convention, schools, guardrail_configs, users, ad_accounts; DB test fixtures. Next: ads mirror + metrics tables.
 - feat(models): campaigns/ad_sets/ads mirrors, metrics_hourly + metrics_daily with upsert keys. Next: leads, events, conversations, visit slots.
 - feat(models): leads (consent, opt-out, deletion, attribution), lead_events (idempotency key), conversations, messages, visit_slots, visit_bookings. Next: KB, creatives, agent runs, proposals, audit, reports.
+- feat(models): kb_facts, creatives, agent_runs, proposed_actions, audit_log, reports; ads.creative_id. Next: Alembic + initial migration.

@@ -53,3 +53,4 @@ class Ad(PlatformObjectMixin, Base):
 
     ad_set_id: Mapped[int] = mapped_column(ForeignKey("ad_sets.id", ondelete="CASCADE"), index=True)
     effective_status: Mapped[str | None] = mapped_column(String(32))  # e.g. DISAPPROVED
+    creative_id: Mapped[int | None] = mapped_column(ForeignKey("creatives.id", ondelete="SET NULL"))
