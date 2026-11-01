@@ -71,7 +71,7 @@ async def run_tool_loop(
     items: list[Item] = list(request.items)
     result = LoopResult(text="", usage=Usage())
     for _ in range(max_iterations):
-        turn = await _respond(provider, LLMRequest(**{**request.__dict__, "items": items}))
+        turn = await _respond(provider, LLMRequest(**{**request.__dict__, "items": list(items)}))
         result.iterations += 1
         result.usage = result.usage + turn.usage
         if result.usage.input_tokens + result.usage.output_tokens > token_budget:
