@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AdmissionPilot Demo</title>
+  <link rel="icon" href="data:,">
   <script src="https://cdn.tailwindcss.com/3.4.5"></script>
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet">
@@ -23,7 +24,7 @@
       <p class="text-sm text-slate-500">{{ school.name }}, {{ school.city }} · WhatsApp admission assistant</p>
     </div>
     {% if lead %}
-    <form hx-post="/demo/reset"><button class="text-sm px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50">New parent</button></form>
+    <form method="post" action="/demo/reset"><button class="text-sm px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50">New parent</button></form>
     {% endif %}
   </header>
 
@@ -50,7 +51,7 @@
         <button class="rounded-full bg-[#00a884] text-white px-4 text-sm font-semibold">Send</button>
       </form>
       {% else %}
-      <form class="wa-bg flex-1 p-5 flex flex-col justify-center gap-3" hx-post="/demo/start">
+      <form class="wa-bg flex-1 p-5 flex flex-col justify-center gap-3" method="post" action="/demo/start">
         <div class="bg-white rounded-xl p-4 shadow-sm space-y-3">
           <p class="text-sm text-slate-600">Simulate a parent submitting an enquiry form. The first reply is an approved template, sent instantly with no AI call.</p>
           <label class="block text-sm">Parent name<input name="parent_name" value="Priya" required class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"></label>

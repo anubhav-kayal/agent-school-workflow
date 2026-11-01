@@ -36,6 +36,7 @@ from app.services.templates import ALL_TEMPLATE_KEYS
 TEMPLATES = Jinja2Templates(directory=Path(__file__).parents[1] / "templates")
 TEMPLATES.env.filters["ist"] = lambda dt: to_ist(dt).strftime("%H:%M:%S") if dt else ""
 COOKIE = "demo_lead"
+NO_KEY = "OPENAI_API_KEY is not set. Add it to .env and restart `make demo`."
 QUICK_TEXT = {"book_visit": "I'd like to book a campus visit", "ask": "I have a question"}
 TRANSPORT = FakeWhatsAppTransport()  # process-wide; demo only
 WA = WhatsAppAdapter(TRANSPORT, set(ALL_TEMPLATE_KEYS))
@@ -101,18 +102,14 @@ async def start(
     lead = (await create_lead(db, school.id, data)).lead
     await send_first_response(db, lead, WA)
     await db.commit()
-    response = Response(
-        status_code=303, headers={"Location": "/demo/chat", "HX-Redirect": "/demo/chat"}
-    )
+    response = Response(status_code=303, headers={"Location": "/demo/chat"})
     response.set_cookie(COOKIE, str(lead.id), httponly=True, samesite="lax")
     return response
 
 
 @router.post("/reset")
 async def reset() -> Response:
-    response = Response(
-        status_code=303, headers={"Location": "/demo/chat", "HX-Redirect": "/demo/chat"}
-    )
+    response = Response(status_code=303, headers={"Location": "/demo/chat"})
     response.delete_cookie(COOKIE)
     return response
 
@@ -130,7 +127,7 @@ async def send(
     if lead is None:
         raise HTTPException(400, "start a conversation first")
     if provider is None:
-        raise HTTPException(503, "Set OPENAI_API_KEY in .env to chat with the assistant.")
+        return await chat_partial(request, db, notice=NO_KEY)
     if button_id in QUICK_TEXT:
         text, button_id = QUICK_TEXT[button_id], None
     if text or button_id:
@@ -143,7 +140,7 @@ async def send(
 
 
 @router.get("/partials/chat", response_class=HTMLResponse)
-async def chat_partial(request: Request, db: Db) -> HTMLResponse:
+async def chat_partial(request: Request, db: Db, notice: str | None = None) -> HTMLResponse:
     lead = await current_lead(request, db)
     messages: list[Message] = []
     if lead is not None:
@@ -158,7 +155,7 @@ async def chat_partial(request: Request, db: Db) -> HTMLResponse:
                     )
                 ).all()
             )
-    ctx = {"lead": lead, "messages": messages}
+    ctx = {"lead": lead, "messages": messages, "notice": notice}
     return TEMPLATES.TemplateResponse(request, "demo/_chat.html", ctx)
 
 

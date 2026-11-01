@@ -20,3 +20,6 @@
 {% if lead and lead.opted_out_at %}
   <div class="text-center text-xs text-slate-600 bg-white/80 rounded-md py-1">Parent opted out. Nothing more will be sent to this number.</div>
 {% endif %}
+{% if notice %}
+  <div class="text-center text-xs text-red-800 bg-red-50 border border-red-200 rounded-md py-1.5 px-2">{{ notice }}</div>
+{% endif %}

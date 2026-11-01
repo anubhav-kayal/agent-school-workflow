@@ -60,8 +60,8 @@ async def test_send_without_api_key_explains(db: AsyncSession) -> None:
     async with client_for(db, demo_mode=True, provider=None) as c:
         await c.post("/demo/start", data={"parent_name": "Ravi", "grade": "Nursery"})
         resp = await c.post("/demo/send", data={"text": "fees?"})
-        assert resp.status_code == 503
-        assert "OPENAI_API_KEY" in resp.text
+        assert resp.status_code == 200  # htmx only swaps 2xx; show the notice in the chat
+        assert "OPENAI_API_KEY is not set" in resp.text
 
 
 @pytest.mark.parametrize("event", ["visited", "admitted"])
