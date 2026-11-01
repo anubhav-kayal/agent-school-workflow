@@ -13,7 +13,7 @@ from app import __version__
 from app.config import get_settings
 from app.db import get_engine, ping_database
 from app.web.routes import demo
-from app.webhooks import forms, meta_leads
+from app.webhooks import forms, meta_leads, whatsapp
 
 
 async def ping_redis() -> bool:
@@ -53,6 +53,7 @@ def create_app() -> FastAPI:
     app.include_router(demo.router)
     app.include_router(forms.router)
     app.include_router(meta_leads.router)
+    app.include_router(whatsapp.router)
     return app
 
 
