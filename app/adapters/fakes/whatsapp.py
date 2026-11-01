@@ -17,3 +17,13 @@ class FakeWhatsAppTransport:
 
     def to(self, phone: str) -> list[dict[str, Any]]:
         return [p for p in self.sent if p["to"] == phone.lstrip("+")]
+
+    def bodies(self, phone: str) -> list[str]:
+        """Visible text of every free-form message (plain text or interactive) to a phone."""
+        out = []
+        for p in self.to(phone):
+            if p["type"] == "text":
+                out.append(p["text"]["body"])
+            elif p["type"] == "interactive":
+                out.append(p["interactive"]["body"]["text"])
+        return out

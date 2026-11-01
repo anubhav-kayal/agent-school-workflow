@@ -19,6 +19,19 @@ from app.services import counselor, visits
 from app.services.leads import get_conversation, recipient_for
 from app.services.routing import Route, route_inbound
 
+LANGUAGE_QUESTION = "Which language would you prefer? / आप किस भाषा में बात करना चाहेंगे?"
+LANGUAGE_BUTTONS = [
+    Button("lang:en", "English"),
+    Button("lang:hi", "हिंदी"),
+    Button("lang:hinglish", "Hinglish"),
+]
+LANGUAGE_SET_TEXT = {
+    "en": "Sure, I'll reply in English from now on. How can I help you?",
+    "hi": "ठीक है, अब से मैं हिंदी में जवाब दूँगा। बताइए, मैं आपकी क्या मदद करूँ?",
+    "hinglish": (
+        "Theek hai, ab se main Hinglish mein jawab doonga. Bataiye, main aapki kya madad karoon?"
+    ),
+}
 BOOKED_TEXT = {
     "en": "Your campus visit is booked for {slot}. We look forward to meeting you!",
     "hi": "आपकी कैंपस विज़िट {slot} के लिए बुक हो गई है। हमें आपसे मिलने का इंतज़ार रहेगा!",
@@ -75,6 +88,12 @@ async def handle_parent_message(
         lead.opted_out_at = now
         await db.flush()
         return Outcome("opt_out")
+    if decision.route is Route.SET_LANGUAGE and decision.language is not None:
+        lead.language = decision.language
+        lead.language_confirmed_at = now
+        text = LANGUAGE_SET_TEXT[decision.language.value]
+        await send_and_record(db, deps.wa, lead, conv, text, [])
+        return Outcome("set_language", text)
     if decision.route is Route.BOOK_SLOT and decision.slot_id is not None:
         try:
             await visits.book_visit(db, lead, decision.slot_id, Actor.ASSISTANT)
@@ -101,7 +120,12 @@ async def _assistant_turn(
     db: AsyncSession, deps: Deps, lead: Lead, conv: Conversation, text: str, now: datetime
 ) -> Outcome:
     reply = await run_assistant(db, deps.settings, deps.provider, lead, conv, text, now)
-    await send_and_record(db, deps.wa, lead, conv, reply.text, reply.buttons)
+    body, buttons = reply.text, reply.buttons
+    if not buttons and lead.language_confirmed_at is None and lead.language_asked_at is None:
+        # Ask the preference once, on the first reply that has no other buttons (no LLM cost).
+        body, buttons = f"{body}\n\n{LANGUAGE_QUESTION}", LANGUAGE_BUTTONS
+        lead.language_asked_at = now
+    await send_and_record(db, deps.wa, lead, conv, body, buttons)
     if reply.state.booked_slot_id:
         await counselor.alert_counselors(db, deps.wa, lead, "Visit booked via chat", text)
     escalated = bool(reply.state.escalations)
@@ -109,7 +133,7 @@ async def _assistant_turn(
         conv.status = "escalated"
         reason, _urgency = reply.state.escalations[0]
         await counselor.alert_counselors(db, deps.wa, lead, reason, text)
-    return Outcome("llm", reply.text, reply.buttons, escalated)
+    return Outcome("llm", body, buttons, escalated)
 
 
 async def send_and_record(

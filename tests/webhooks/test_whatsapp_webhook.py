@@ -75,7 +75,7 @@ async def test_unknown_parent_becomes_whatsapp_lead_and_gets_reply(db: AsyncSess
     lead = await db.scalar(select(Lead).where(Lead.phone == "+919999900050"))
     assert lead is not None and lead.source is LeadSource.WHATSAPP
     assert lead.consent_source == "whatsapp_inbound" and lead.first_response_at is not None
-    assert transport.to("+919999900050")[0]["text"]["body"].startswith("Ji, Class 1")
+    assert transport.bodies("+919999900050")[0].startswith("Ji, Class 1")
     assert await db.scalar(select(Message.id).where(Message.wa_message_id == "wamid.T1"))
 
 

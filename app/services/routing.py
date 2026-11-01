@@ -7,7 +7,7 @@ import unicodedata
 from dataclasses import dataclass
 from enum import StrEnum
 
-from app.models.enums import LeadEventType
+from app.models.enums import Language, LeadEventType
 
 # Exact-match (after normalisation) so "don't stop sending" is NOT an opt-out.
 STOP_PHRASES = {
@@ -28,6 +28,7 @@ STOP_PHRASES = {
 }
 OPT_OUT_BUTTON = "optout"
 SLOT_PREFIX = "slot:"
+LANGUAGE_PREFIX = "lang:"  # lang:en | lang:hi | lang:hinglish
 COUNSELOR_PREFIX = "lead:"  # lead:<id>:<event>
 COUNSELOR_EVENTS = {
     "visit_booked": LeadEventType.VISIT_BOOKED,
@@ -41,6 +42,7 @@ class Route(StrEnum):
     OPT_OUT = "opt_out"
     BOOK_SLOT = "book_slot"
     COUNSELOR_STATUS = "counselor_status"
+    SET_LANGUAGE = "set_language"
     LLM = "llm"
 
 
@@ -50,6 +52,7 @@ class Decision:
     slot_id: int | None = None
     lead_id: int | None = None
     event: LeadEventType | None = None
+    language: Language | None = None
 
 
 def normalise(text: str) -> str:
@@ -62,6 +65,10 @@ def route_inbound(text: str | None, button_id: str | None) -> Decision:
     if button_id:
         if button_id == OPT_OUT_BUTTON:
             return Decision(Route.OPT_OUT)
+        if button_id.startswith(LANGUAGE_PREFIX):
+            value = button_id[len(LANGUAGE_PREFIX) :]
+            if value in {lang.value for lang in Language}:
+                return Decision(Route.SET_LANGUAGE, language=Language(value))
         if button_id.startswith(SLOT_PREFIX) and button_id[len(SLOT_PREFIX) :].isdigit():
             return Decision(Route.BOOK_SLOT, slot_id=int(button_id[len(SLOT_PREFIX) :]))
         if decision := _counselor(button_id):

@@ -117,6 +117,7 @@ def build_tools(db: AsyncSession, lead: Lead, now: datetime, state: TurnState) -
 
     async def set_language(args: dict[str, Any]) -> str:
         lead.language = Language(args["language"])
+        lead.language_confirmed_at = now
         return json.dumps({"ok": True})
 
     async def escalate(args: dict[str, Any]) -> str:

@@ -87,7 +87,7 @@ async def test_lead_to_visit_end_to_end(
         ),
     )
     await run_jobs(ctx, enqueuer)
-    assert "₹85,000" in sent[-1]["text"]["body"]  # 4. KB answer
+    assert "₹85,000" in ctx["wa"].transport.bodies("+" + PARENT)[-1]  # 4. KB answer
 
     slot = await db.scalar(select(VisitSlot).order_by(VisitSlot.starts_at))
     assert slot is not None

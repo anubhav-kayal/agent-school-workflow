@@ -49,3 +49,4 @@
 - docs: To-verify items for OpenAI/WhatsApp/Meta specifics found during M2; demo mode in ARCHITECTURE. M2 code complete; evals await OPENAI_API_KEY.
 - fix(agents): tool loop now sends tool definitions on every model call (eval run 1 showed zero tool calls); Hindi detection tolerates English school words. Regression tests added.
 - fix(assistant): tell the model TODAY (IST) in the per-turn tail (not the cached prefix) + prompt rule to pass named days to get_visit_slots; evals check offered slot labels (2 named-day scenarios).
+- feat(language): ask English/हिंदी/Hinglish preference once (buttons on first reply without other buttons, no LLM); lang:* taps set + confirm preference; leads.language_asked_at/confirmed_at (+migration).

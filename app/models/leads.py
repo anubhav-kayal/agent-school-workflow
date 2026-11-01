@@ -28,6 +28,8 @@ class Lead(IdMixin, TimestampMixin, Base):
     email: Mapped[str | None] = mapped_column(String(254))  # optional; enhanced conversions
     grade_interest: Mapped[str | None] = mapped_column(String(32))
     language: Mapped[Language] = mapped_column(str_enum(Language, "language"), default=Language.EN)
+    language_asked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    language_confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     consent: Mapped[bool] = mapped_column(default=False)
     consent_source: Mapped[str | None] = mapped_column(String(100))  # e.g. "meta_form:123"
     consent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

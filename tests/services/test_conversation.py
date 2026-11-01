@@ -68,7 +68,7 @@ async def test_escalation_alerts_counselor(db: AsyncSession) -> None:
     )
     out = await handle_parent_message(db, deps, lead, "Any discount?", None, "wamid.D1", NOW)
     assert out.escalated
-    assert transport.to(PARENT)[0]["text"]["body"].startswith("A counselor")
+    assert transport.bodies(PARENT)[0].startswith("A counselor")
     assert len(transport.to(COUNSELOR)) == 1
 
 
@@ -78,3 +78,21 @@ async def test_duplicate_webhook_delivery_ignored(db: AsyncSession) -> None:
     out = await handle_parent_message(db, deps, lead, "Hi", None, "wamid.DUP", NOW)
     assert out.route == "duplicate"
     assert len(transport.to(PARENT)) == 1
+
+
+async def test_language_asked_once_then_preference_applied(db: AsyncSession) -> None:
+    lead, deps, transport = await setup(
+        db, text_turn("Class 1 fees are ₹85,000."), text_turn("Transport covers Baner.")
+    )
+    await handle_parent_message(db, deps, lead, "fees?", None, "wamid.L1", NOW)
+    first = transport.to(PARENT)[-1]
+    ids = [b["reply"]["id"] for b in first["interactive"]["action"]["buttons"]]
+    assert ids == ["lang:en", "lang:hi", "lang:hinglish"] and lead.language_asked_at == NOW
+
+    out = await handle_parent_message(db, deps, lead, "Hinglish", "lang:hinglish", "wamid.L2", NOW)
+    assert out.route == "set_language" and lead.language.value == "hinglish"
+    assert lead.language_confirmed_at == NOW
+    assert transport.to(PARENT)[-1]["text"]["body"].startswith("Theek hai")
+
+    await handle_parent_message(db, deps, lead, "bus?", None, "wamid.L3", NOW)
+    assert transport.to(PARENT)[-1]["type"] == "text"  # not asked again

@@ -80,4 +80,4 @@ async def test_whatsapp_job_runs_assistant(db: AsyncSession) -> None:
         button_id=None,
     )
     assert route == "llm"
-    assert ctx["wa"].transport.sent[0]["text"]["body"] == "Hello! How can I help?"
+    assert ctx["wa"].transport.bodies("+919999900070")[0].startswith("Hello! How can I help?")
